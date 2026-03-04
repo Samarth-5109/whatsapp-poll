@@ -8,19 +8,11 @@ const client = new Client({
   }
 });
 
-const PHONE_NUMBER = "919818634811"; 
-
-client.on("qr", async () => {
-//   console.log("Scan this QR code:");
-//   qrcode.generate(qr, { small: true });
-    console.log("Generating pairing code...");
-    try {
-    const code = await client.requestPairingCode(PHONE_NUMBER);
-    console.log("Pairing Code:", code);
-    console.log("Open WhatsApp → Linked Devices → Link with phone number → enter this code.");
-  } catch (err) {
-    console.error("Pairing code error:", err);
-  }
+client.on("qr", (qr) => {
+  console.log("Scan this QR code:");
+  qrcode.generate(qr, { small: true });
+  console.log("QR Link:");
+  console.log(`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qr)}`);
 });
 
 client.on("ready", async () => {
@@ -37,10 +29,15 @@ client.on("ready", async () => {
 //   });
 });
 
+
+//guard to avoid multiple reconnect loops.Sometimes Railway containers restart and initialize() gets called twice.
 client.on("disconnected", (reason) => {
   console.log("WhatsApp disconnected:", reason);
-  console.log("Reconnecting...");
-  client.initialize();
+
+  setTimeout(() => {
+    console.log("Reconnecting...");
+    client.initialize();
+  }, 5000);
 });
 
 client.initialize();
