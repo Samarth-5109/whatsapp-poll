@@ -1,0 +1,19 @@
+node_modules/
+
+# whatsapp-web.js session
+.wwebjs_auth/
+.wwebjs_cache/
+
+# database
+*.db
+*.db-journal
+
+# OS / temp files
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+
+# env
+.env
