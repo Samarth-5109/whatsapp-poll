@@ -8,9 +8,19 @@ const client = new Client({
   }
 });
 
-client.on("qr", (qr) => {
-  console.log("Scan this QR code:");
-  qrcode.generate(qr, { small: true });
+const PHONE_NUMBER = "919818634811"; 
+
+client.on("qr", async () => {
+//   console.log("Scan this QR code:");
+//   qrcode.generate(qr, { small: true });
+    console.log("Generating pairing code...");
+    try {
+    const code = await client.requestPairingCode(PHONE_NUMBER);
+    console.log("Pairing Code:", code);
+    console.log("Open WhatsApp → Linked Devices → Link with phone number → enter this code.");
+  } catch (err) {
+    console.error("Pairing code error:", err);
+  }
 });
 
 client.on("ready", async () => {
