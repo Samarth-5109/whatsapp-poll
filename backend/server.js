@@ -15,7 +15,7 @@ const GROUP_ID = "120363422779147089@g.us";
 const holidays = ["2026-03-20"];
 
 let cronStarted = false;
-
+let lastPollDate = null;
 /* ------------------ MONITORING ENDPOINTS ------------------ */
 
 app.get("/", (req, res) => {
@@ -26,7 +26,7 @@ app.get("/status", (req, res) => {
   res.json({
     bot: "running",
     cron: cronStarted ? "active" : "not started",
-    nextPoll: "8:07 PM IST"
+    nextPoll: "8:07 PM IST",
   });
 });
 
@@ -39,20 +39,35 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule("7 20 * * 1-5", async () => {
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const today = now.toISOString().split("T")[0];
+
+    // Prevent running outside the exact time
+    if (hour !== 20 || minute !== 7) {
+      console.log("Cron triggered outside scheduled time, skipping.");
+      return;
+    }
+
+    // Prevent duplicate poll on restart
+    if (lastPollDate === today) {
+      console.log("Poll already sent today, skipping.");
+      return;
+    }
 
     if (holidays.includes(today)) {
       console.log("Office holiday — poll not sent");
       return;
     }
 
+    lastPollDate = today;
+    
     console.log("Sending taxi poll...");
 
     const chat = await client.getChatById(GROUP_ID);
 
     const pollMessage = await chat.sendMessage(new Poll("🚕", ["Yes", "No"]));
-
-    console.log("Poll sent");
 
     console.log("Poll sent");
 
@@ -64,7 +79,7 @@ client.on("ready", () => {
       } catch (err) {
         console.log("Voting failed:", err);
       }
-    }, 3000);
+    }, 7000);
   });
 
   console.log("Cron job started");
