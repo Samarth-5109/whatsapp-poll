@@ -39,7 +39,7 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule(
-    "22 20 * * 1-5",
+    "22 20 * * 0-4",
     async () => {
       const now = new Date();
       const hour = now.getHours();
