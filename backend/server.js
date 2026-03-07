@@ -26,7 +26,7 @@ app.get("/status", (req, res) => {
   res.json({
     bot: "running",
     cron: cronStarted ? "active" : "not started",
-    nextPoll: "8:15 PM IST",
+    nextPoll: "8:13 PM IST",
   });
 });
 
@@ -39,7 +39,7 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule(
-    "15 20 * * 0-4",
+    "13 20 * * 0-4",
     async () => {
       const now = new Date();
       const hour = now.getHours();
@@ -47,7 +47,7 @@ client.on("ready", () => {
       const today = now.toISOString().split("T")[0];
 
       // Prevent running outside the exact time
-      if (hour !== 20 || minute !== 22) {
+      if (hour !== 20 || minute !== 13) {
         console.log("Cron triggered outside scheduled time, skipping.");
         return;
       }
