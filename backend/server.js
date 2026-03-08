@@ -46,12 +46,6 @@ client.on("ready", () => {
       const minute = now.getMinutes();
       const today = now.toISOString().split("T")[0];
 
-      // Prevent running outside the exact time
-      if (hour !== 20 || minute !== 13) {
-        console.log("Cron triggered outside scheduled time, skipping.");
-        return;
-      }
-
       // Prevent duplicate poll on restart
       if (lastPollDate === today) {
         console.log("Poll already sent today, skipping.");
