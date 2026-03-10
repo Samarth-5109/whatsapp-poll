@@ -26,7 +26,7 @@ app.get("/status", (req, res) => {
   res.json({
     bot: "running",
     cron: cronStarted ? "active" : "not started",
-    nextPoll: "8:13 PM IST",
+    nextPoll: "8:30 PM IST",
   });
 });
 
@@ -39,14 +39,10 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule(
-    "13 20 * * 0-4",
+    "30 20 * * 0-4",
     async () => {
-      const now = new Date();
-      const hour = now.getHours();
-      const minute = now.getMinutes();
-      const today = now.toISOString().split("T")[0];
+      const today = new Date().toISOString().split("T")[0];
 
-      // Prevent duplicate poll on restart
       if (lastPollDate === today) {
         console.log("Poll already sent today, skipping.");
         return;
@@ -57,17 +53,28 @@ client.on("ready", () => {
         return;
       }
 
-      lastPollDate = today;
-
       console.log("Sending taxi poll...");
 
-      const chat = await client.getChatById(GROUP_ID);
+      let pollMessage;
 
-      const pollMessage = await chat.sendMessage(new Poll("🚕", ["Yes", "No"]));
+      try {
+        await client.pupPage.bringToFront();
 
-      console.log("Poll sent");
+        const chat = await client.getChatById(GROUP_ID);
 
-      // wait 3 seconds so WhatsApp registers the poll
+        pollMessage = await chat.sendMessage(
+          new Poll("🚕", ["Yes", "No"])
+        );
+
+        console.log("Poll sent");
+
+        lastPollDate = today;
+
+      } catch (err) {
+        console.log("Poll failed:", err);
+        return;
+      }
+
       setTimeout(async () => {
         try {
           await pollMessage.vote([1]);
@@ -77,16 +84,14 @@ client.on("ready", () => {
         }
       }, 7000);
     },
-    {
-      timezone: "Asia/Kolkata",
-    },
+    { timezone: "Asia/Kolkata" }
   );
 
   console.log("Cron job started");
 });
 
-/* ------------------ START SERVER ------------------ */
 
+// START SERVER (outside ready event)
 app.listen(PORT, () => {
   console.log("Server running on port", PORT);
 });
