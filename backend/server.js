@@ -26,7 +26,7 @@ app.get("/status", (req, res) => {
   res.json({
     bot: "running",
     cron: cronStarted ? "active" : "not started",
-    nextPoll: "8:30 PM IST",
+    nextPoll: "8:45 PM IST",
   });
 });
 
@@ -39,7 +39,7 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule(
-    "30 20 * * 0-4",
+    "45 20 * * 0-4",
     async () => {
       const today = new Date().toISOString().split("T")[0];
 
