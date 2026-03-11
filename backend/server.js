@@ -27,7 +27,7 @@ app.get("/status", (req, res) => {
   res.json({
     bot: "running",
     cron: cronStarted ? "active" : "not started",
-    nextPoll: "9:05 PM IST",
+    nextPoll: "8:07 PM IST",
   });
 });
 
@@ -96,7 +96,7 @@ client.on("ready", () => {
   cronStarted = true;
 
   cron.schedule(
-    "05 21 * * 0-4",
+    "07 20 * * 0-4",
     sendTaxiPoll,
     { timezone: "Asia/Kolkata" }
   );
